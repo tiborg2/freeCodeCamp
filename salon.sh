@@ -43,15 +43,24 @@ MAIN_MENU() {
     then
       echo -e "\nI don't have a record for that phone number, what's your name?"
       read CUSTOMER_NAME
-      echo -e "What time would you like your$SELECTED_SERVICE, $CUSTOMER_NAME."
+      CUSTOMER=$($PSQL "INSERT INTO customers (phone, name) VALUES('$CUSTOMER_PHONE', '$CUSTOMER_NAME')")
+    
+      echo -e "\nWhat time would you like your$SELECTED_SERVICE, $CUSTOMER_NAME."
       read SERVICE_TIME
       echo -e "\nI have put you down for a$SELECTED_SERVICE at $SERVICE_TIME, $CUSTOMER_NAME."
+    
     else
-      CUSTOMER_NAME = $CUSTOMER
-      echo -e "What time would you like your$SELECTED_SERVICE, $CUSTOMER_NAME."
+      CUSTOMER_NAME=$CUSTOMER
+      echo -e "\nWhat time would you like your$SELECTED_SERVICE,$CUSTOMER_NAME."
       read SERVICE_TIME
-      echo -e "\nI have put you down for a$SELECTED_SERVICE at $SERVICE_TIME, $CUSTOMER_NAME."
+      echo -e "\nI have put you down for a$SELECTED_SERVICE at $SERVICE_TIME,$CUSTOMER_NAME."
     fi
+
+    #Taking id number of new customer
+    CUSTOMER_ID=$($PSQL "SELECT customer_id FROM customers WHERE phone = '$CUSTOMER_PHONE'")
+    
+    #Inserting new appointment
+    NEW_SERVICE=$($PSQL "INSERT INTO appointments (customer_id, service_id, time) VALUES($CUSTOMER_ID, $SERVICE_ID_SELECTED, '$SERVICE_TIME')")
   fi
 }
 MAIN_MENU
